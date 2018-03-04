@@ -1,11 +1,15 @@
-package com.example.qklahpita.toeicvocab12;
+package com.example.qklahpita.toeicvocab12.databases;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.qklahpita.toeicvocab12.databases.models.CategoryModel;
+import com.example.qklahpita.toeicvocab12.databases.models.TopicModel;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -61,5 +65,30 @@ public class DatabaseManager {
         Log.d(TAG, "getListTopic: " + topicModelList);
 
         return topicModelList;
+    }
+
+    public List<CategoryModel> getListCategory(List<TopicModel> topicModelList) {
+        List<CategoryModel> categoryModelList = new ArrayList<>();
+        for (int i = 0; i < topicModelList.size(); i = i+5) {
+            CategoryModel categoryModel = new CategoryModel(
+                    topicModelList.get(i).category,
+                    topicModelList.get(i).color);
+            categoryModelList.add(categoryModel);
+        }
+
+        return categoryModelList;
+    }
+
+    public HashMap<String, List<TopicModel>> getHashMapTopic(
+            List<TopicModel> topicModelList,
+            List<CategoryModel> categoryModelList) {
+        HashMap<String, List<TopicModel>> hashMap = new HashMap<>();
+        for (int i = 0; i < categoryModelList.size(); i++) {
+            int positionTopic = i*5;
+
+            hashMap.put(categoryModelList.get(i).name,
+                    topicModelList.subList(positionTopic, positionTopic + 5));
+        }
+        return hashMap;
     }
 }

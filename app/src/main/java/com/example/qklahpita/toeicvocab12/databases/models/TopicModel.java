@@ -1,4 +1,4 @@
-package com.example.qklahpita.toeicvocab12;
+package com.example.qklahpita.toeicvocab12.databases.models;
 
 /**
  * Created by qklahpita on 3/1/18.

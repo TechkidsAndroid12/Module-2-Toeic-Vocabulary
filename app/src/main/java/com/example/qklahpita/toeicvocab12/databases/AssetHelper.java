@@ -1,4 +1,4 @@
-package com.example.qklahpita.toeicvocab12;
+package com.example.qklahpita.toeicvocab12.databases;
 
 import android.content.Context;
 
