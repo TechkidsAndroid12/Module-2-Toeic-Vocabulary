@@ -1,5 +1,6 @@
 package com.example.qklahpita.toeicvocab12.databases;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,6 +8,7 @@ import android.util.Log;
 
 import com.example.qklahpita.toeicvocab12.databases.models.CategoryModel;
 import com.example.qklahpita.toeicvocab12.databases.models.TopicModel;
+import com.example.qklahpita.toeicvocab12.databases.models.WordModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,5 +92,59 @@ public class DatabaseManager {
                     topicModelList.subList(positionTopic, positionTopic + 5));
         }
         return hashMap;
+    }
+
+    public WordModel getRandomWord(int topicId, int preId) {
+        sqLiteDatabase = assetHelper.getReadableDatabase();
+
+        Cursor cursor;
+        int level = 0;
+        do {
+            //1. level?
+            double random = Math.random() * 100; // 0 <= random < 100
+            if (random < 5) level = 4;
+            else if (random < 15) level = 3;
+            else if (random < 30) level = 2;
+            else if (random < 60) level = 1;
+            else level = 0;
+
+            //2. word?
+            cursor = sqLiteDatabase.rawQuery("select * from " + TABLE_WORD +
+                    " where topic_id = " + topicId +
+                    " and level = " + level +
+                    " and id <> " + preId +
+                    " order by random() limit 1", null);
+        } while (cursor.getCount() == 0);
+
+        cursor.moveToFirst();
+        int id = cursor.getInt(0);
+        String origin = cursor.getString(1);
+        String explanation = cursor.getString(2);
+        String type = cursor.getString(3);
+        String pronunciation = cursor.getString(4);
+        String imageUrl = cursor.getString(5);
+        String example = cursor.getString(6);
+        String exampleTrans = cursor.getString(7);
+
+        WordModel wordModel = new WordModel(id, origin, explanation,
+                type, pronunciation, imageUrl, example, exampleTrans, topicId, level);
+
+        return wordModel;
+    }
+
+    public void updateWordLevel(WordModel wordModel, boolean isKnown) {
+        sqLiteDatabase = assetHelper.getWritableDatabase();
+
+        int level = wordModel.level;
+        if (isKnown && level < 4) {
+            level++;
+        } else if (!isKnown && level > 0) {
+            level--;
+        }
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("level", level);
+        sqLiteDatabase.update(TABLE_WORD, contentValues,
+                "id = " + wordModel.id, null);
     }
 }
