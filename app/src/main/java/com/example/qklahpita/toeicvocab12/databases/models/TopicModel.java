@@ -1,10 +1,12 @@
 package com.example.qklahpita.toeicvocab12.databases.models;
 
+import java.io.Serializable;
+
 /**
  * Created by qklahpita on 3/1/18.
  */
 
-public class TopicModel {
+public class TopicModel implements Serializable {
     public int id;
     public String name;
     public String imageUrl;
