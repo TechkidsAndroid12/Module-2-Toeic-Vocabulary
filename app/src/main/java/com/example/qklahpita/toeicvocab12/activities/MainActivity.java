@@ -12,6 +12,8 @@ import com.example.qklahpita.toeicvocab12.databases.DatabaseManager;
 import com.example.qklahpita.toeicvocab12.databases.models.CategoryModel;
 import com.example.qklahpita.toeicvocab12.databases.models.TopicModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,15 +36,18 @@ public class MainActivity extends AppCompatActivity {
         HashMap<String, List<TopicModel>> hashMap = DatabaseManager.getInstance(this).getHashMapTopic(
                 topicModelList, categoryModelList);
 
-        toeicExpandableListViewAdapter = new ToeicExpandableListViewAdapter(categoryModelList, hashMap);
+        toeicExpandableListViewAdapter = new ToeicExpandableListViewAdapter(this, categoryModelList, hashMap);
 
         elvToeic.setAdapter(toeicExpandableListViewAdapter);
 
         elvToeic.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-
                 TopicModel topicModel = topicModelList.get(i*5 + i1);
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                String lastTime = simpleDateFormat.format(Calendar.getInstance().getTime());
+                DatabaseManager.getInstance(MainActivity.this).updateLastTime(topicModel, lastTime);
 
                 Intent intent = new Intent(MainActivity.this, StudyActivity.class);
                 intent.putExtra("topic", topicModel);
@@ -51,5 +56,11 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        toeicExpandableListViewAdapter.refreshList(this);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.qklahpita.toeicvocab12.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.qklahpita.toeicvocab12.R;
+import com.example.qklahpita.toeicvocab12.databases.DatabaseManager;
 import com.example.qklahpita.toeicvocab12.databases.models.CategoryModel;
 import com.example.qklahpita.toeicvocab12.databases.models.TopicModel;
 
@@ -25,10 +27,12 @@ public class ToeicExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     List<CategoryModel> categoryModelList;
     HashMap<String, List<TopicModel>> topicModelHashMap;
+    Context context;
 
-    public ToeicExpandableListViewAdapter(List<CategoryModel> categoryModelList, HashMap<String, List<TopicModel>> topicModelHashMap) {
+    public ToeicExpandableListViewAdapter(Context context, List<CategoryModel> categoryModelList, HashMap<String, List<TopicModel>> topicModelHashMap) {
         this.categoryModelList = categoryModelList;
         this.topicModelHashMap = topicModelHashMap;
+        this.context = context;
     }
 
     @Override
@@ -112,6 +116,12 @@ public class ToeicExpandableListViewAdapter extends BaseExpandableListAdapter {
         TextView tvLastTime = view.findViewById(R.id.tv_last_time);
         ProgressBar pbTopic = view.findViewById(R.id.pb_topic);
 
+        pbTopic.setMax(12);
+        pbTopic.setProgress(DatabaseManager.getInstance(context)
+                .getNumOfMasterWordByTopicId(topicModel.id));
+        pbTopic.setSecondaryProgress(12 - DatabaseManager.getInstance(context)
+                .getNumOfNewWordByTopicId(topicModel.id));
+
         tvTopic.setText(topicModel.name);
         if (topicModel.lastTime != null) {
             tvLastTime.setText(topicModel.lastTime);
@@ -123,5 +133,17 @@ public class ToeicExpandableListViewAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int i, int i1) {
         return true;
+    }
+
+    public void refreshList(Context context) {
+        //1. change data
+//        topicModelHashMap = DatabaseManager.getInstance()...
+
+        topicModelHashMap.clear();
+        topicModelHashMap.putAll(DatabaseManager.getInstance(context).getHashMapTopic(
+                DatabaseManager.getInstance(context).getListTopic(), categoryModelList));
+
+        //2. refresh: add, remove, addAll, removeAll, clear,...
+        notifyDataSetChanged();
     }
 }

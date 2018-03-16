@@ -147,4 +147,31 @@ public class DatabaseManager {
         sqLiteDatabase.update(TABLE_WORD, contentValues,
                 "id = " + wordModel.id, null);
     }
+
+    public void updateLastTime(TopicModel topicModel, String lastTime) {
+        sqLiteDatabase = assetHelper.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("last_time", lastTime);
+        sqLiteDatabase.update(TABLE_TOPIC, contentValues,
+                "id = " + topicModel.id, null);
+    }
+
+    public int getNumOfMasterWordByTopicId(int topicId) {
+        sqLiteDatabase = assetHelper.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("select level from " + TABLE_WORD
+                + " where level = 4 and topic_id = " + topicId,
+                null);
+        Log.d(TAG, "getNumOfMasterWordByTopicId: " + cursor.getCount());
+        return cursor.getCount();
+    }
+
+    public int getNumOfNewWordByTopicId(int topicId) {
+        sqLiteDatabase = assetHelper.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("select level from " + TABLE_WORD
+                        + " where level = 0 and topic_id = " + topicId,
+                null);
+        Log.d(TAG, "getNumOfNewWordByTopicId: " + cursor.getCount());
+        return cursor.getCount();
+    }
 }

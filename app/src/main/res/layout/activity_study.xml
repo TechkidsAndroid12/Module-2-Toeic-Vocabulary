@@ -33,6 +33,7 @@
         android:layout_margin="16dp">
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/cl_full"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -79,10 +80,10 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/tv_name_topic"
                 android:layout_marginTop="8dp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_pronun"
-                android:visibility="gone">
+                app:layout_constraintTop_toBottomOf="@+id/tv_pronun">
 
                 <TextView
                     android:id="@+id/tv_explain"

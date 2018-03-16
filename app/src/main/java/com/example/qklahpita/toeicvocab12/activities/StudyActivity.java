@@ -1,8 +1,14 @@
 package com.example.qklahpita.toeicvocab12.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.LayoutTransition;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.Guideline;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.View;
@@ -55,9 +61,12 @@ public class StudyActivity extends AppCompatActivity {
     RelativeLayout rlBackground;
     @BindView(R.id.tv_level)
     TextView tvLevel;
+    @BindView(R.id.cl_full)
+    ConstraintLayout clFull;
 
     WordModel wordModel;
     int preId = -1;
+    AnimatorSet animatorSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,17 +122,14 @@ public class StudyActivity extends AppCompatActivity {
                 onBackPressed();
                 break;
             case R.id.tv_details:
+                clFull.setLayoutTransition(new LayoutTransition());
                 changeContent(false);
                 break;
             case R.id.tv_didnt_know:
-                changeContent(true);
-                DatabaseManager.getInstance(this).updateWordLevel(wordModel, false);
-                loadData();
+                nextWord(false);
                 break;
             case R.id.tv_knew:
-                changeContent(true);
-                DatabaseManager.getInstance(this).updateWordLevel(wordModel, true);
-                loadData();
+                nextWord(true);
                 break;
         }
     }
@@ -136,5 +142,30 @@ public class StudyActivity extends AppCompatActivity {
             clDetailPart.setVisibility(View.VISIBLE);
             tvDetails.setVisibility(View.GONE);
         }
+    }
+
+    public void nextWord(final boolean isKnown) {
+        setAnimation(R.animator.animation_move_to_left);
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+
+                DatabaseManager.getInstance(StudyActivity.this).updateWordLevel(wordModel, isKnown);
+                loadData();
+
+                clFull.setLayoutTransition(null);
+
+                changeContent(true);
+                setAnimation(R.animator.animation_move_from_right);
+            }
+        });
+    }
+
+    public void setAnimation(int animation) {
+        animatorSet = (AnimatorSet) AnimatorInflater.loadAnimator(this, animation);
+        animatorSet.setTarget(cvWord);
+        animatorSet.start();
     }
 }

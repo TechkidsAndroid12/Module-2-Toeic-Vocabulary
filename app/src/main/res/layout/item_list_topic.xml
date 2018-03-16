@@ -23,7 +23,8 @@
         android:layout_height="5dp"
         android:layout_below="@id/tv_name_topic"
         android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="4dp"
+        android:progressDrawable="@drawable/custom_progress_bar"/>
 
     <TextView
         android:id="@+id/tv_last_time"
