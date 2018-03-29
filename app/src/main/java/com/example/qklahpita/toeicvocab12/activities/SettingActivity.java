@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -18,8 +19,12 @@ import android.widget.Toast;
 
 import com.example.qklahpita.toeicvocab12.R;
 import com.example.qklahpita.toeicvocab12.ReminderService;
+import com.example.qklahpita.toeicvocab12.databases.DatabaseManager;
+import com.example.qklahpita.toeicvocab12.databases.models.TopicModel;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,6 +61,19 @@ public class SettingActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("Setting", MODE_PRIVATE);
         editor = sharedPreferences.edit();
+
+        List<TopicModel> topicModels = DatabaseManager.getInstance(this).getListTopic();
+        List<String> topicName = new ArrayList<>();
+        for (TopicModel topicModel : topicModels) {
+            topicName.add(topicModel.name);
+        }
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.item_list_review,
+                topicName
+        );
+        lvTopics.setAdapter(arrayAdapter);
 
         String time = sharedPreferences.getString(TIME_REMINDER, null);
         if (time != null) {
@@ -119,6 +137,7 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     private void saveSetting() {
+        //save timer
         if (swReminder.isChecked()) {
 
             //save
@@ -149,6 +168,9 @@ public class SettingActivity extends AppCompatActivity {
         } else {
             editor.putString(TIME_REMINDER, null);
         }
+
+        //save topic review
+
         editor.commit();
 
         Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
