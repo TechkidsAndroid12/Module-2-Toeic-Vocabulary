@@ -13,6 +13,8 @@ import com.example.qklahpita.toeicvocab12.activities.ReviewActivity;
 public class ScreenOnReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        context.startActivity(new Intent(context, ReviewActivity.class));
+        Intent intent1 = new Intent(context, ReviewActivity.class);
+        intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent1);
     }
 }
