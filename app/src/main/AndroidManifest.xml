@@ -22,9 +22,15 @@
         <activity android:name=".activities.SettingActivity" />
 
         <service
-            android:name=".ReminderService"
+            android:name=".backgrounds.ReminderService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+        <service
+            android:name=".backgrounds.ScreenOnService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".activities.ReviewActivity"></activity>
     </application>
 
 </manifest>

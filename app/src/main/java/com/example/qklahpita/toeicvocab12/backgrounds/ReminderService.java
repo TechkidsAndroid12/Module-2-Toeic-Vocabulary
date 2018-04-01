@@ -1,4 +1,4 @@
-package com.example.qklahpita.toeicvocab12;
+package com.example.qklahpita.toeicvocab12.backgrounds;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.example.qklahpita.toeicvocab12.R;
 import com.example.qklahpita.toeicvocab12.activities.MainActivity;
 
 public class ReminderService extends Service {

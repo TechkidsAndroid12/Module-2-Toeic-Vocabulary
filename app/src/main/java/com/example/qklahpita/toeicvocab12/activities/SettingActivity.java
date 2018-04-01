@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
@@ -18,20 +20,25 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.qklahpita.toeicvocab12.R;
-import com.example.qklahpita.toeicvocab12.ReminderService;
+import com.example.qklahpita.toeicvocab12.backgrounds.ReminderService;
+import com.example.qklahpita.toeicvocab12.backgrounds.ScreenOnService;
 import com.example.qklahpita.toeicvocab12.databases.DatabaseManager;
 import com.example.qklahpita.toeicvocab12.databases.models.TopicModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class SettingActivity extends AppCompatActivity {
+    private static final String TAG = "SettingActivity";
     public final String TIME_REMINDER = "time_reminder";
+    public final String TOPIC_REMINDER = "topic_reminder";
 
     @BindView(R.id.iv_back)
     ImageView ivBack;
@@ -75,12 +82,23 @@ public class SettingActivity extends AppCompatActivity {
         );
         lvTopics.setAdapter(arrayAdapter);
 
-        String time = sharedPreferences.getString(TIME_REMINDER, null);
+        time = sharedPreferences.getString(TIME_REMINDER, null);
         if (time != null) {
             tvPickTimer.setText(time);
             swReminder.setChecked(true);
         } else {
             tvPickTimer.setVisibility(View.GONE);
+        }
+
+        Set<String> set = sharedPreferences.getStringSet(TOPIC_REMINDER, null);
+        if (set != null) {
+            swReview.setChecked(true);
+            List<String> listChecked = new ArrayList<>(set);
+            for (String position : listChecked) {
+                lvTopics.setItemChecked(Integer.parseInt(position), true);
+            }
+        } else {
+            lvTopics.setVisibility(View.GONE);
         }
 
         swReminder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -98,6 +116,17 @@ public class SettingActivity extends AppCompatActivity {
                     if (isChecked) {
                         setTimeReminder();
                     }
+                }
+            }
+        });
+
+        swReview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    lvTopics.setVisibility(View.VISIBLE);
+                } else {
+                    lvTopics.setVisibility(View.GONE);
                 }
             }
         });
@@ -170,6 +199,30 @@ public class SettingActivity extends AppCompatActivity {
         }
 
         //save topic review
+        if (swReview.isChecked()) {
+            //1. get checked list
+            Log.d(TAG, "saveSetting: " + lvTopics.getCheckedItemPositions());
+            SparseBooleanArray sparseBooleanArray = lvTopics.getCheckedItemPositions();
+
+            //2. add checked position to set
+            Set<String> set = new HashSet<>();
+            for (int i = 0; i < lvTopics.getAdapter().getCount(); i++) {
+                if (sparseBooleanArray.get(i)) {
+                    set.add(i + "");
+                }
+            }
+
+            //3. save set to SP
+            if (set.size() > 0) {
+                editor.putStringSet(TOPIC_REMINDER, set);
+                startService(new Intent(this, ScreenOnService.class));
+            } else {
+                editor.putStringSet(TOPIC_REMINDER, null);
+            }
+
+        } else {
+            editor.putStringSet(TOPIC_REMINDER, null);
+        }
 
         editor.commit();
 
